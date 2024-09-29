@@ -12,7 +12,7 @@ public class GameScore
     [SerializeField] private Sprite playerOnePointSprite;
     [SerializeField] private Sprite playerTwoPointSprite;
     
-    public void StartGame(int points) 
+    public void Init(int points) 
     {
         playerOneScore.SetData(points, defaultSprite, playerOnePointSprite);
         playerTwoScore.SetData(points, defaultSprite, playerTwoPointSprite);

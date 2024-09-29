@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,46 +12,77 @@ public class GameMaster : MonoBehaviour
         Instance = this;
     }
 
-    private GameRule currentGameRule;
-
-    [SerializeField] private GameRule testGameRule;
-    IEnumerator Start() 
+    #region [- SimpleGameStart -]
+    [SerializeField] private GameRule simpleGameRule;
+    public void StartSimpleGame()
     {
-        yield return new WaitForSeconds(2);
-        StartGame(testGameRule);
-    }
+        StartGame(simpleGameRule, GameType.PlayerVsBot);
+    } 
+    #endregion
 
-    public void StartGame(GameRule gameRule) 
+    [SerializeField] private BotHandler botHandler;
+    [SerializeField] private PlayerHandler playerHandler;
+
+    private GameRule currentGameRule;
+    private GameType currentGameType;
+
+    public void StartGame(GameRule gameRule, GameType gameType) 
     {
         ResetGame();
 
+        StartGameEvent?.Invoke();
+
         currentGameRule = gameRule;
+        currentGameType = gameType;
+
+        StartCoroutine(Intro());
+    }
+
+    private IEnumerator Intro() 
+    {
+        gameScore.Init(currentGameRule.ScoreToWin);
+
+        yield return new WaitForSeconds(3);
+
+        switch (currentGameType)
+        {
+            case GameType.PlayerVsBot:
+                playerHandler.StartGame(1);
+                botHandler.AssignBot(2);
+                break;
+            case GameType.PlayerVsPlayerLocal:
+                break;
+            case GameType.PlayerVsPlayerOnline:
+                break;
+        }
+
         StartCoroutine(DealCards());
     }
 
     public void ResetGame() 
     {
-
+        ResetGameEvent?.Invoke();
     }
 
+    #region [- Card Pos -]
     [SerializeField] private Transform cardsPositionParent;
     [SerializeField] private Transform cardPosition;
     [SerializeField] private Transform cardParent;
     private Transform[] cardPositions;
-    private void CreateCardPos(int cardsNo) 
+    private void CreateCardPos(int cardsNo)
     {
-        if (cardPositions != null && cardPositions.Length > 0) 
+        if (cardPositions != null && cardPositions.Length > 0)
         {
             DeleteCardPos();
         }
 
         cardPositions = new Transform[cardsNo];
-        for (int i = 0; i < cardsNo; i++) 
+        for (int i = 0; i < cardsNo; i++)
         {
             cardPositions[i] = Instantiate(cardPosition, cardsPositionParent);
         }
     }
-    private void DeleteCardPos() 
+    private void DeleteCardPos()
     {
         for (int i = 0; i < cardPositions.Length; i++)
         {
@@ -58,11 +90,13 @@ public class GameMaster : MonoBehaviour
         }
         cardPositions = null;
     }
+    #endregion
 
+    #region [- Cards -]
     [SerializeField] private CardCollection cardCollection;
     [SerializeField] private Card card;
     private Card[] cards;
-    public IEnumerator DealCards() 
+    public IEnumerator DealCards()
     {
         if (cards != null && cards.Length > 0)
         {
@@ -71,13 +105,13 @@ public class GameMaster : MonoBehaviour
                 cards[i].ResetInput();
             }
         }
-        else 
+        else
         {
             List<CardAsset> cardAssets = new List<CardAsset>();
-            for (int i = 0; i < currentGameRule.Cards.Length; i++) 
+            for (int i = 0; i < currentGameRule.Cards.Length; i++)
             {
                 CardAsset cardAsset = cardCollection.GetCard(currentGameRule.Cards[i].CardType);
-                for (int j = 0; j < currentGameRule.Cards[i].Count; j++) 
+                for (int j = 0; j < currentGameRule.Cards[i].Count; j++)
                 {
                     cardAssets.Add(cardAsset);
                 }
@@ -90,7 +124,7 @@ public class GameMaster : MonoBehaviour
             yield return null;
 
             cards = new Card[cardAssets.Count];
-            for (int i = 0; i < cardAssets.Count; i++) 
+            for (int i = 0; i < cardAssets.Count; i++)
             {
                 Card newCard = Instantiate(card, cardParent);
                 cards[i] = newCard;
@@ -114,23 +148,76 @@ public class GameMaster : MonoBehaviour
         yield return new WaitForSeconds(.5f);
         StartCoroutine(card.FlipCard(true));
     }
-    private IEnumerator HideCard(Card card) 
+    private IEnumerator HideCards()
     {
+        for (int i = 0; i < cards.Length; i++)
+        {
+            StartCoroutine(card.FlipCard(true));
+            card.transform.DOMove(cardParent.position, .5f);
+
+            yield return new WaitForSeconds(.25f);
+        }
         yield return null;
+        foreach (Card card in cards) 
+        {
+            card.gameObject.SetActive(false);
+        }
     }
 
-    private void DeleteCards() 
+    private void DeleteCards()
     {
         for (int i = 0; i < cards.Length; i++)
         {
             Destroy(cards[i]);
         }
         cards = null;
-    }
-
-    #region [- Score -]
-    [SerializeField] private GameScore gameScore; 
-    
+    } 
     #endregion
 
+    #region [- Score -]
+
+    [SerializeField] private GameScore gameScore;
+
+    private IEnumerator RevealCards() 
+    {
+        yield return new WaitForSeconds(1f);
+
+        yield return new WaitForSeconds(1f);
+        
+    }
+
+    #endregion
+
+    #region [- Input -]
+    public void GetInput(int playerNum, CardType cardType) 
+    {
+        if (playerNum == 1)
+        {
+            playerOneSelectedCardType = cardType;
+            playerOneSelect = true;
+        } 
+        else if (playerNum == 2) 
+        {
+            playerTwoSelectedCardType = cardType;
+            playerTwoSelect = true;
+        }
+
+        if (playerOneSelect && playerTwoSelect)
+        {
+        }
+    }
+
+    private bool playerOneSelect;
+    private CardType playerOneSelectedCardType;
+    private bool playerTwoSelect;
+    private CardType playerTwoSelectedCardType;
+    #endregion
+
+    public Action ResetGameEvent;
+    public Action StartGameEvent;
+    public Action DealCardsEvent;
+    public Action StartSelectEvent;
+    public Action EndSelectEvent;
+    public Action ShowCardsEvent;
+    public Action ResultEvent;
 }

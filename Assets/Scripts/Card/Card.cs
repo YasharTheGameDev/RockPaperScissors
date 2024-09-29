@@ -5,9 +5,9 @@ using DG.Tweening;
 using System.Collections;
 using Unity.VisualScripting;
 
-public class Card : MonoBehaviour, IPointerClickHandler
+public class Card : MonoBehaviour, ICard,IPointerClickHandler
 {
-    private CardType cardType;
+    public CardType CardType { get; private set; }
     [SerializeField] private Image cardMiddleImage;
     [SerializeField] private Image cardIconImage;
 
@@ -21,7 +21,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         cardBehind.SetActive(true);
         cardFront.SetActive(false);
 
-        cardType = cardAsset.CardType;
+        CardType = cardAsset.CardType;
         cardMiddleImage.color = cardAsset.CardColor;
         cardIconImage.sprite = cardAsset.CardIconSprite;
     }
@@ -53,6 +53,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     public void CardSelect()
     {
         cardHalo.SetActive(true);
+        
     }
     public void CardDeselect() 
     {
