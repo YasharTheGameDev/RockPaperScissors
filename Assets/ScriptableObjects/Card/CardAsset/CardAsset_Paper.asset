@@ -15,4 +15,4 @@ MonoBehaviour:
   <CardType>k__BackingField: 1
   <CardIconSprite>k__BackingField: {fileID: 21300000, guid: 2acd60cf29ee2164ca25f7821a29d4dc, type: 3}
   <CardColor>k__BackingField: {r: 0.9098039, g: 0.6901961, b: 0.003921569, a: 1}
-  <CardName>k__BackingField: 
+  <CardSmallSprite>k__BackingField: {fileID: 21300000, guid: 2fa449da2eee79c429a7c512e6b62102, type: 3}

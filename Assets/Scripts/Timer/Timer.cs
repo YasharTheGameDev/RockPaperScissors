@@ -11,17 +11,15 @@ public class Timer : MonoBehaviour
 
     public void TimerVisibility(bool visible, float duration) 
     {
+        barImage.fillAmount = visible ? 1f : 0f;
         timerCamvasGroup.DOFade(visible ? 1f : 0f, duration);
     }
 
-    public void StartTimer(float duration, Action endTimerEvent) 
-    {
-
-    }
-    public IEnumerator TimerStart(float duration) 
+    public IEnumerator StartTimer(float duration, Action endTimerEvent) 
     {
         barImage.fillAmount = 1f;
-        barImage.DOFillAmount(0f, duration);
+        barImage.DOFillAmount(0f, duration).SetEase(Ease.Linear);
         yield return new WaitForSeconds(duration);
+        endTimerEvent?.Invoke();
     }
 }

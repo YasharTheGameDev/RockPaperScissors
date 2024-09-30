@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.unity.2d.sprite": "1.0.0",
+    "com.unity.build-report-inspector": "file:C:/Users/d/Downloads/BuildReportInspector-master/BuildReportInspector-master/com.unity.build-report-inspector",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.feature.development": "1.0.1",
     "com.unity.localization": "1.4.5",

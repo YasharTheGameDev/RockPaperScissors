@@ -15,6 +15,11 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
     [SerializeField] private GameObject cardBehind;
     [SerializeField] private GameObject cardFront;
 
+    [SerializeField] private AudioFile flipAudio;
+    [SerializeField] private AudioFile selectAudio;
+
+    private IPlayerCardSelect playerCardSelect;
+
     public void SetData(CardAsset cardAsset)
     {
         cardHalo.SetActive(false);
@@ -27,7 +32,13 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
     }
     public void ResetInput()
     {
-
+        cardHalo.SetActive(false);
+        cardBehind.SetActive(true);
+        cardFront.SetActive(false);
+    }
+    public void SetPlayer(IPlayerCardSelect playerCardSelect) 
+    { 
+        this.playerCardSelect = playerCardSelect;
     }
 
     public void OnPointerClick(PointerEventData pointerEventData)
@@ -42,6 +53,8 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
 
         transform.DORotate(new Vector3(0f, 90f, 0f), .1f);
 
+        AudioMaster.Instance.PlayAudio(flipAudio);
+
         yield return new WaitForSeconds(.1f);
 
         cardFront.SetActive(front);
@@ -52,8 +65,12 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
 
     public void CardSelect()
     {
-        cardHalo.SetActive(true);
-        
+        if (playerCardSelect != null && playerCardSelect.SelectAllow) 
+        {
+            AudioMaster.Instance.PlayAudio(selectAudio);
+            cardHalo.SetActive(true);
+            playerCardSelect.SelectCard(this);
+        }
     }
     public void CardDeselect() 
     {

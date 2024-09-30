@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58a1f81615d66ab45a924d6721778fc8, type: 3}
   m_Name: CardCombination_Paper&Rock
   m_EditorClassIdentifier: 
-  winnerCardType: 1
-  loserCardType: 0
+  <WinnerCardType>k__BackingField: {fileID: 11400000, guid: 2a5a8035550cc80409754addf766b699, type: 2}
+  <LoserCardType>k__BackingField: {fileID: 11400000, guid: af959ba5090b42245a4dfa60939ff498, type: 2}

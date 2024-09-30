@@ -358,6 +358,8 @@ MonoBehaviour:
   cardHalo: {fileID: 87337965972615294}
   cardBehind: {fileID: 6663881696831095836}
   cardFront: {fileID: 1120989153121913667}
+  flipAudio: {fileID: 11400000, guid: eb6455071990f0748a32d9d9b235cadd, type: 2}
+  selectAudio: {fileID: 11400000, guid: 2916ef608f63075459ecddb91cd9e453, type: 2}
 --- !u!1 &6663881696831095836
 GameObject:
   m_ObjectHideFlags: 0

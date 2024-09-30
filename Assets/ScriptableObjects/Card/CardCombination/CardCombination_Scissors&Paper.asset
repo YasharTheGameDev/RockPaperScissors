@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58a1f81615d66ab45a924d6721778fc8, type: 3}
   m_Name: CardCombination_Scissors&Paper
   m_EditorClassIdentifier: 
-  winnerCardType: 2
-  loserCardType: 1
+  <WinnerCardType>k__BackingField: {fileID: 11400000, guid: 6cf7400ed26fe1146aafe3ad8af18305, type: 2}
+  <LoserCardType>k__BackingField: {fileID: 11400000, guid: 2a5a8035550cc80409754addf766b699, type: 2}

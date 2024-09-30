@@ -13,6 +13,6 @@ public class TimerManager : MonoBehaviour
     }
     public void StartTimer(float duration, Action endTimerEvent) 
     {
-        timer.StartTimer(duration, endTimerEvent);
+        StartCoroutine(timer.StartTimer(duration, endTimerEvent));
     }
 }

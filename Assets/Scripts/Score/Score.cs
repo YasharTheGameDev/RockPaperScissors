@@ -33,6 +33,9 @@ public class Score : MonoBehaviour
         currentScore++;
     }
 
-    
+    public bool Win() 
+    {
+        return currentScore == scorePointsImage.Length;
+    }
 
 }

@@ -20,6 +20,12 @@ public class BotHandler : MonoBehaviour
 
     public void SendInput() 
     {
-        //GameMaster.Instance.GetInput();
+        GameMaster.Instance.GetInput(playerNum, cards[Random.Range(0, cards.Length)].CardType);
+    }
+
+    private Card[] cards;
+    public void GetCards(Card[] cards) 
+    {
+        this.cards = cards;
     }
 }

@@ -3,8 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Card combination", menuName = "Card/Card Combination", order = 2)]
 public class CardCombination : ScriptableObject
 {
-    [SerializeField] private CardType winnerCardType;
-    [SerializeField] private CardType loserCardType;
+    [field: SerializeField] public CardAsset WinnerCardType { get; private set; }
+    [field: SerializeField] public CardAsset LoserCardType { get; private set; }
 
     public CardCombinationResult Result(CardType playerOneCardType, CardType playerTwoCardType) 
     {
@@ -12,34 +12,35 @@ public class CardCombination : ScriptableObject
         bool loserCard = false;
 
         #region [- Player One -]
-        if (playerOneCardType == winnerCardType)
+        if (playerOneCardType == WinnerCardType.CardType)
         {
             winnerCard = true;
         }
-        else if (playerOneCardType == loserCardType)
+        else if (playerOneCardType == LoserCardType.CardType)
         {
-            winnerCard = true;
+            loserCard = true;
         }
         #endregion
 
         #region [- Player Two -]
-        if (playerTwoCardType == winnerCardType)
+        if (playerTwoCardType == WinnerCardType.CardType)
         {
             winnerCard = true;
         }
-        else if (playerTwoCardType == loserCardType)
+        else if (playerTwoCardType == LoserCardType.CardType)
         {
-            winnerCard = true;
-        } 
+            loserCard = true;
+        }
         #endregion
 
         if (winnerCard && loserCard) 
         {
-            if (winnerCardType == playerOneCardType) 
+            Debug.Log("TRUE");
+            if (WinnerCardType.CardType == playerOneCardType) 
             {
                 return CardCombinationResult.WinnerP1;
             }
-            else if (winnerCardType == playerTwoCardType) 
+            else if (WinnerCardType.CardType == playerTwoCardType) 
             {
                 return CardCombinationResult.WinnerP2;
             }
