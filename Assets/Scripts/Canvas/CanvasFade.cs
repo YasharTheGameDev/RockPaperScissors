@@ -8,43 +8,37 @@ using UnityEngine.UI;
 public class CanvasFade 
 {
     [SerializeField] private GameObject canvas;
-    [SerializeField] private Image fadeImg;
+    [SerializeField] private CanvasGroup fadeCanvasGroup;
 
-    public IEnumerator Fade(bool fadeIn, float durtaion) 
+    #region [- Behaviours -]
+    public IEnumerator Fade(bool fadeIn, float durtaion)
     {
-        Color color = fadeImg.color;
-        color.a = fadeIn ? 0f : 1f;
-        fadeImg.color = color;
+        fadeCanvasGroup.alpha = fadeIn ? 0f : 1f;
         canvas.SetActive(true);
-        fadeImg.DOFade(fadeIn ? 1f : 0f, durtaion);
+        fadeCanvasGroup.DOFade(fadeIn ? 1f : 0f, durtaion);
         yield return new WaitForSeconds(durtaion);
         canvas.SetActive(false);
     }
-
     public IEnumerator Fade(bool fadeIn, float durtaion, float startDelay)
     {
         canvas.SetActive(true);
-        Color color = fadeImg.color;
-        color.a = fadeIn ? 0f : 1f;
-        fadeImg.color = color;
+        fadeCanvasGroup.alpha= fadeIn ? 0f : 1f;
         yield return new WaitForSeconds(startDelay);
-        fadeImg.DOFade(fadeIn ? 1f : 0f, durtaion);
+        fadeCanvasGroup.DOFade(fadeIn ? 1f : 0f, durtaion);
         yield return new WaitForSeconds(durtaion);
         canvas.SetActive(false);
     }
-
-    public IEnumerator Fade(float durtaion, float stayDuration, Action action) 
+    public IEnumerator Fade(float durtaion, float stayDuration, Action action)
     {
-        Color color = fadeImg.color;
-        color.a = 0f;
-        fadeImg.color = color;
+        fadeCanvasGroup.alpha = 0;
         canvas.SetActive(true);
-        fadeImg.DOFade(1f, durtaion);
+        fadeCanvasGroup.DOFade(1f, durtaion);
         yield return new WaitForSeconds(durtaion);
         action?.Invoke();
         yield return new WaitForSeconds(stayDuration);
-        fadeImg.DOFade(0f, durtaion);
+        fadeCanvasGroup.DOFade(0f, durtaion);
         yield return new WaitForSeconds(durtaion);
         canvas.SetActive(false);
-    }
+    } 
+    #endregion
 }

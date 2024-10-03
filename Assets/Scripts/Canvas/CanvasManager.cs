@@ -1,8 +1,8 @@
 using DG.Tweening;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CanvasManager : MonoBehaviour
@@ -61,6 +61,15 @@ public class CanvasManager : MonoBehaviour
     }
     public void GoHomeBtnPress()
     {
+        Time.timeScale = 1f;
+        Action StartGameAction = () =>
+        {
+            //GameMaster.Instance.ResetGame();
+            mainMenuCanvas.SetActive(true);
+            playCanvas.SetActive(false);
+            SceneManager.LoadScene(0);
+        };
+        StartCoroutine(canvasFade.Fade(.5f, .5f, StartGameAction));
     }
     #endregion
 
@@ -86,5 +95,9 @@ public class CanvasManager : MonoBehaviour
 
     #region [- Result -]
     [SerializeField] private CanvasResult canvasResult;
+    public void ShowResult(int playerNum, Sprite playerOneIcon, Sprite playerTwoIcon) 
+    {
+        StartCoroutine(canvasResult.ShowWinner(playerNum, playerOneIcon, playerTwoIcon));
+    }
     #endregion
 }

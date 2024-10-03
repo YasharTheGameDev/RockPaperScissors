@@ -8,6 +8,14 @@ using UnityEngine.UI;
 public class GameMaster : MonoBehaviour
 {
     public static GameMaster Instance;
+
+    public Action ResetGameEvent;
+    public Action StartGameEvent;
+    public Action StartSelectEvent;
+    public Action EndSelectEvent;
+    public Action<int> ResultEvent;
+
+    #region [- Unity -]
     private void Awake()
     {
         Instance = this;
@@ -16,23 +24,26 @@ public class GameMaster : MonoBehaviour
     private void Start()
     {
         tutorialHandler.Init(cardCombinationList);
-    }
+    } 
+    #endregion
 
     #region [- SimpleGameStart -]
     [SerializeField] private GameRule simpleGameRule;
     public void StartSimpleGame()
     {
         StartGame(simpleGameRule, GameType.PlayerVsBot);
-    } 
+    }
     #endregion
 
+    #region [- StartGame -]
     [SerializeField] private BotHandler botHandler;
     [SerializeField] private PlayerHandler playerHandler;
 
     private GameRule currentGameRule;
     private GameType currentGameType;
 
-    public void StartGame(GameRule gameRule, GameType gameType) 
+    #region [- Behaviours -]
+    public void StartGame(GameRule gameRule, GameType gameType)
     {
         ResetGame();
 
@@ -43,10 +54,20 @@ public class GameMaster : MonoBehaviour
 
         StartCoroutine(Intro());
     }
-
-    private IEnumerator Intro() 
+    private IEnumerator Intro()
     {
-        gameScore.Init(currentGameRule.ScoreToWin);
+        switch (currentGameType)
+        {
+            case GameType.PlayerVsBot:
+                gameScore.Init(currentGameRule.ScoreToWin, humanPlayerSprite, botPlayerSprite);
+                break;
+            case GameType.PlayerVsPlayerLocal:
+                gameScore.Init(currentGameRule.ScoreToWin, humanPlayerSprite, humanPlayerSprite);
+                break;
+            case GameType.PlayerVsPlayerOnline:
+                gameScore.Init(currentGameRule.ScoreToWin, humanPlayerSprite, humanPlayerSprite);
+                break;
+        }
 
         yield return new WaitForSeconds(3);
 
@@ -63,29 +84,47 @@ public class GameMaster : MonoBehaviour
         }
 
         StartCoroutine(DealCards());
-        timerManager.TimerVisibility(true, .5f);
     }
+    private IEnumerator StartNextRound()
+    {
+        playerOneSelect = false;
+        playerTwoSelect = false;
 
-    public void ResetGame() 
+        yield return new WaitForSeconds(1f);
+
+        StartCoroutine(playerOneResultCard.FlipCard(false));
+        playerOneResultCard.transform.DOMove(cardParent.position, 1f);
+
+        StartCoroutine(playerTwoResultCard.FlipCard(false));
+        playerTwoResultCard.transform.DOMove(opponentCardParent.position, 1f);
+
+        yield return new WaitForSeconds(1.5f);
+
+        StartCoroutine(DealCards());
+    }
+    public void ResetGame()
     {
         ResetGameEvent?.Invoke();
         DeleteCards();
+        DeleteCardPos();
+        gameScore.OnReset();
 
         playerOneSelect = false;
         playerTwoSelect = false;
-    }
+    }  
+    #endregion
+    #endregion
 
     #region [- Card Pos -]
+
     [SerializeField] private Transform cardsPositionParent;
     [SerializeField] private Transform cardPosition;
+
     private Transform[] cardPositions;
+
+    #region [- Behaviours -]
     private void CreateCardPos(int cardsNo)
     {
-        if (cardPositions != null && cardPositions.Length > 0)
-        {
-            DeleteCardPos();
-        }
-
         cardPositions = new Transform[cardsNo];
         for (int i = 0; i < cardsNo; i++)
         {
@@ -94,12 +133,17 @@ public class GameMaster : MonoBehaviour
     }
     private void DeleteCardPos()
     {
-        for (int i = 0; i < cardPositions.Length; i++)
+        if (cardPositions != null && cardPositions.Length > 0)
         {
-            Destroy(cardPositions[i]);
+            for (int i = 0; i < cardPositions.Length; i++)
+            {
+                Destroy(cardPositions[i]);
+            }
+            cardPositions = null;
         }
-        cardPositions = null;
-    }
+    } 
+    #endregion
+
     #endregion
 
     #region [- Cards -]
@@ -107,13 +151,17 @@ public class GameMaster : MonoBehaviour
     [SerializeField] private Card card;
     [SerializeField] private Transform cardParent;
     [SerializeField] private Transform opponentCardParent;
-    private Card[] cards;
 
     [SerializeField] private Card playerOneResultCard;
     [SerializeField] private Transform playerOneRevealPos;
     [SerializeField] private Card playerTwoResultCard;
     [SerializeField] private Transform playerTwoRevealPos;
 
+    [SerializeField] private AudioFile showCardAudio;
+
+    private Card[] cards;
+
+    #region [- Behaviours -]
     public IEnumerator DealCards()
     {
         if (cards != null && cards.Length > 0)
@@ -159,22 +207,25 @@ public class GameMaster : MonoBehaviour
             yield return new WaitForSeconds(.25f);
         }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
 
         playerHandler.GetCards(cards);
-        if (currentGameType == GameType.PlayerVsBot) 
+        if (currentGameType == GameType.PlayerVsBot)
         {
             botHandler.GetCards(cards);
         }
 
-        Action endTimerEvent = () => 
+        timerManager.TimerVisibility(true, .5f);
+
+        yield return new WaitForSeconds(.5f);
+
+        Action endTimerEvent = () =>
         {
             StartCoroutine(HideCards());
         };
-        timerManager.StartTimer(5f, endTimerEvent);
+        timerManager.StartTimer(currentGameRule.SelectDuration, endTimerEvent);
+        StartSelectEvent?.Invoke();
     }
-
-    [SerializeField] private AudioFile showCardAudio;
     private IEnumerator ShowCard(Card card, int index)
     {
         AudioMaster.Instance.PlayAudio(showCardAudio);
@@ -185,6 +236,8 @@ public class GameMaster : MonoBehaviour
     }
     private IEnumerator HideCards()
     {
+        EndSelectEvent?.Invoke();
+
         timerManager.TimerVisibility(false, .5f);
 
         for (int i = 0; i < cards.Length; i++)
@@ -197,7 +250,7 @@ public class GameMaster : MonoBehaviour
 
         yield return new WaitForSeconds(.5f);
 
-        foreach (Card card in cards) 
+        foreach (Card card in cards)
         {
             card.gameObject.SetActive(false);
         }
@@ -207,10 +260,9 @@ public class GameMaster : MonoBehaviour
         playerHandler.SendInput();
         botHandler.SendInput();
     }
-
     private void DeleteCards()
     {
-        if (cards != null && cards.Length > 0) 
+        if (cards != null && cards.Length > 0)
         {
             for (int i = 0; i < cards.Length; i++)
             {
@@ -218,15 +270,24 @@ public class GameMaster : MonoBehaviour
             }
             cards = null;
         }
-    } 
+    }  
+    #endregion
     #endregion
 
     #region [- Score -]
 
     [SerializeField] private GameScore gameScore;
+    [SerializeField] private Sprite humanPlayerSprite;
+    [SerializeField] private Sprite botPlayerSprite;
+    [SerializeField] private Image cardRevealImage;
 
-    private IEnumerator RevealCards() 
+    #region [- Behaviours -]
+    private IEnumerator RevealCards()
     {
+        cardRevealImage.DOFade(1f, .25f);
+
+        AudioMaster.Instance.PlayAudio(showCardAudio);
+
         playerOneResultCard.SetData(cardCollection.GetCard(playerOneSelectedCardType));
         playerOneResultCard.transform.position = cardParent.position;
         playerOneResultCard.transform.DOMove(playerOneRevealPos.position, 1f);
@@ -243,45 +304,35 @@ public class GameMaster : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         Debug.Log("CheckResult()");
-        CheckResult();
+        StartCoroutine(CheckResult()); 
     }
-
-    private IEnumerator StartNextRound() 
-    {
-        playerOneSelect = false;
-        playerTwoSelect = false;
-
-        yield return new WaitForSeconds(1f);
-
-        StartCoroutine(playerOneResultCard.FlipCard(false));
-        playerOneResultCard.transform.DOMove(cardParent.position, 1f);
-
-        StartCoroutine(playerTwoResultCard.FlipCard(false));
-        playerTwoResultCard.transform.DOMove(opponentCardParent.position, 1f);
-
-        yield return new WaitForSeconds(1.5f);
-
-        StartCoroutine(DealCards());
-        timerManager.TimerVisibility(true, .5f);
-    }
+    #endregion
 
     #endregion
 
-    [SerializeField] private TutorialHandler tutorialHandler;
+    #region [- Tutorial -]
+    [SerializeField] private TutorialHandler tutorialHandler; 
+    #endregion
 
     #region [- Timer -]
-    [SerializeField] private TimerManager timerManager; 
+    [SerializeField] private TimerManager timerManager;
     #endregion
 
     #region [- Input -]
-    public void GetInput(int playerNum, CardType cardType) 
+    private bool playerOneSelect;
+    private CardType playerOneSelectedCardType;
+    private bool playerTwoSelect;
+    private CardType playerTwoSelectedCardType;
+
+    #region [- Behaviours -]
+    public void GetInput(int playerNum, CardType cardType)
     {
         if (playerNum == 1)
         {
             playerOneSelectedCardType = cardType;
             playerOneSelect = true;
-        } 
-        else if (playerNum == 2) 
+        }
+        else if (playerNum == 2)
         {
             playerTwoSelectedCardType = cardType;
             playerTwoSelect = true;
@@ -292,12 +343,8 @@ public class GameMaster : MonoBehaviour
             Debug.Log("RevealCards()");
             StartCoroutine(RevealCards());
         }
-    }
-
-    private bool playerOneSelect;
-    private CardType playerOneSelectedCardType;
-    private bool playerTwoSelect;
-    private CardType playerTwoSelectedCardType;
+    } 
+    #endregion
     #endregion
 
     #region [- Combination -]
@@ -305,13 +352,19 @@ public class GameMaster : MonoBehaviour
     [SerializeField] private AudioFile scoreAudio;
     [SerializeField] private AudioFile drawAudio;
 
-    private void CheckResult() 
+    [SerializeField] private Image resultHalo;
+    [SerializeField] private Color resultDrawColor;
+    [SerializeField] private Color resultPlayerOneColor;
+    [SerializeField] private Color resultPlayerTwoColor;
+
+    #region [- Behaviours -]
+    private IEnumerator CheckResult()
     {
         Debug.Log("CheckResult");
-        CardCombinationResult cardCombinationResult = 
+        CardCombinationResult cardCombinationResult =
             cardCombinationList.Result(playerOneSelectedCardType, playerTwoSelectedCardType);
 
-        switch (cardCombinationResult) 
+        switch (cardCombinationResult)
         {
             case CardCombinationResult.Draw:
                 AudioMaster.Instance.PlayAudio(drawAudio);
@@ -326,24 +379,56 @@ public class GameMaster : MonoBehaviour
                 break;
         }
 
+        StartCoroutine(ResultColor(cardCombinationResult));
+
+        yield return new WaitForSeconds(1f);
+
+        cardRevealImage.DOFade(0f, .25f);
+
+        yield return new WaitForSeconds(.5f);
+
         int winnerNum = gameScore.GetWinner();
         Debug.Log("winnerNum: " + winnerNum);
         if (winnerNum == 0)
         {
             StartCoroutine(StartNextRound());
         }
-        else 
+        else
         {
-            // EndGame
+            Sprite playerOneIcon = botPlayerSprite;
+            Sprite playerTwoIcon = botPlayerSprite;
+            switch (currentGameType) 
+            {
+                case GameType.PlayerVsBot:
+                    playerOneIcon = humanPlayerSprite;
+                    playerTwoIcon = botPlayerSprite;
+                    break;
+
+            }
+            CanvasManager.Instance.ShowResult(winnerNum, playerOneIcon, playerTwoIcon);
         }
     }
-    #endregion
+    private IEnumerator ResultColor(CardCombinationResult cardCombinationResult)
+    {
+        switch (cardCombinationResult)
+        {
+            case CardCombinationResult.Draw:
+                resultHalo.color = resultDrawColor;
+                break;
+            case CardCombinationResult.WinnerP1:
+                resultHalo.color = resultPlayerOneColor;
+                break;
+            case CardCombinationResult.WinnerP2:
+                resultHalo.color = resultPlayerTwoColor;
+                break;
+        }
 
-    public Action ResetGameEvent;
-    public Action StartGameEvent;
-    //public Action DealCardsEvent;
-    //public Action StartSelectEvent;
-    public Action EndSelectEvent;
-    //public Action ShowCardsEvent;
-    //public Action ResultEvent;
+        resultHalo.DOFade(.75f, .25f);
+
+        yield return new WaitForSeconds(1f);
+
+        resultHalo.DOFade(0f, .25f);
+    } 
+    #endregion
+    #endregion
 }

@@ -6,7 +6,8 @@ public class CardCombination : ScriptableObject
     [field: SerializeField] public CardAsset WinnerCardType { get; private set; }
     [field: SerializeField] public CardAsset LoserCardType { get; private set; }
 
-    public CardCombinationResult Result(CardType playerOneCardType, CardType playerTwoCardType) 
+    #region [- Behaviours -]
+    public CardCombinationResult Result(CardType playerOneCardType, CardType playerTwoCardType)
     {
         bool winnerCard = false;
         bool loserCard = false;
@@ -33,14 +34,14 @@ public class CardCombination : ScriptableObject
         }
         #endregion
 
-        if (winnerCard && loserCard) 
+        if (winnerCard && loserCard)
         {
             Debug.Log("TRUE");
-            if (WinnerCardType.CardType == playerOneCardType) 
+            if (WinnerCardType.CardType == playerOneCardType)
             {
                 return CardCombinationResult.WinnerP1;
             }
-            else if (WinnerCardType.CardType == playerTwoCardType) 
+            else if (WinnerCardType.CardType == playerTwoCardType)
             {
                 return CardCombinationResult.WinnerP2;
             }
@@ -48,4 +49,5 @@ public class CardCombination : ScriptableObject
 
         return CardCombinationResult.Null;
     }
+    #endregion
 }

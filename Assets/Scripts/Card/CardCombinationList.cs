@@ -5,6 +5,7 @@ public class CardCombinationList : ScriptableObject
 {
     [field: SerializeField] public CardCombination[] CardCombinations { get; private set; }
 
+    #region [- Behaviours -]
     public CardCombinationResult Result(CardType playerOneCardType, CardType playerTwoCardType)
     {
         if (playerOneCardType == playerTwoCardType)
@@ -23,5 +24,6 @@ public class CardCombinationList : ScriptableObject
         }
 
         return CardCombinationResult.Null;
-    }
+    } 
+    #endregion
 }

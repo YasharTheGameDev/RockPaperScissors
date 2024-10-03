@@ -5,9 +5,10 @@ public class CardCollection : ScriptableObject
 {
     [SerializeField] private CardAsset[] Cards;
 
+    #region [- Behaviours -]
     public CardAsset GetCard(CardType cardType)
     {
-        foreach (var card in Cards) 
+        foreach (var card in Cards)
         {
             if (card.CardType == cardType)
             {
@@ -15,5 +16,6 @@ public class CardCollection : ScriptableObject
             }
         }
         return null;
-    }
+    } 
+    #endregion
 }

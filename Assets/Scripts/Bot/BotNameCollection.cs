@@ -5,8 +5,10 @@ public class BotNameCollection : ScriptableObject
 {
     [SerializeField] private string[] names;
 
-    public string GetRandomName() 
+    #region [- Behaviours -]
+    public string GetRandomName()
     {
         return names[Random.Range(0, names.Length)];
-    }
+    } 
+    #endregion
 }

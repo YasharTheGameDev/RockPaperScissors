@@ -3,11 +3,11 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 using System.Collections;
-using Unity.VisualScripting;
 
 public class Card : MonoBehaviour, ICard,IPointerClickHandler
 {
     public CardType CardType { get; private set; }
+
     [SerializeField] private Image cardMiddleImage;
     [SerializeField] private Image cardIconImage;
 
@@ -20,6 +20,7 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
 
     private IPlayerCardSelect playerCardSelect;
 
+    #region [- Behaviours -]
     public void SetData(CardAsset cardAsset)
     {
         cardHalo.SetActive(false);
@@ -36,8 +37,8 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
         cardBehind.SetActive(true);
         cardFront.SetActive(false);
     }
-    public void SetPlayer(IPlayerCardSelect playerCardSelect) 
-    { 
+    public void SetPlayer(IPlayerCardSelect playerCardSelect)
+    {
         this.playerCardSelect = playerCardSelect;
     }
 
@@ -46,7 +47,7 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
         CardSelect();
     }
 
-    public IEnumerator FlipCard(bool front) 
+    public IEnumerator FlipCard(bool front)
     {
         cardFront.SetActive(!front);
         cardBehind.SetActive(front);
@@ -65,15 +66,16 @@ public class Card : MonoBehaviour, ICard,IPointerClickHandler
 
     public void CardSelect()
     {
-        if (playerCardSelect != null && playerCardSelect.SelectAllow) 
+        if (playerCardSelect != null && playerCardSelect.SelectAllow)
         {
             AudioMaster.Instance.PlayAudio(selectAudio);
             cardHalo.SetActive(true);
             playerCardSelect.SelectCard(this);
         }
     }
-    public void CardDeselect() 
+    public void CardDeselect()
     {
         cardHalo.SetActive(false);
-    }
+    } 
+    #endregion
 }
