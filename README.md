@@ -1,10 +1,11 @@
 # Rock paper scissors 
 
 ## Desciption
-This is a single-player Rock-Paper-Scissors game where the player competes against a bot. The game has been designed with a card-based interface, giving it a unique look and feel compared to traditional RPS games. The goal is simple: whoever scores 5 points first wins the game!
+This is a single-player Rock-Paper-Scissors game where the player competes against a bot. The game features a unique card-based interface, adding a fresh look and feel to the classic RPS gameplay. The objective is straightforward: whoever scores 5 points first wins the game!
+
+This game was developed in just 5 days by me.
 
 Features:
-
 Single-player mode against an AI bot.
 Card-based design for a fresh twist on the classic Rock-Paper-Scissors.
 Simple and intuitive gameplay.
