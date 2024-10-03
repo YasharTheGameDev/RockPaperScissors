@@ -17,17 +17,22 @@ The winner of each round is determined based on the classic rules: Rock beats Sc
 The first player to score 5 points wins!
 Feel free to check out the code on GitHub or play the game on Itch.io!
 
-![RockPaperScissors Start And Play Gif](https://github.com/user-attachments/assets/168e5e52-f3ea-4be0-a5c0-45ce6837ea37)
+![RockPaperScissors Start And Play Gif](Description/RockPaperScissors Start And Play Gif.gif)
 
 ## How to play
 [Play for free!](https://yasharthegamedev.itch.io/rock-paper-scissors)
 
 ## Plan
+![plan](Description/plan.jpg)
+[Fullscreen](https://drive.google.com/file/d/1D_gsY81G7Drmmii5rimHCK6C5tZ3q1Zn/view?usp=sharing)
 
 ## Screenshots
-
-## Contact
-[LinkTree](https://linktr.ee/YasharTheGameDev)
-[Linkdin](https://www.linkedin.com/in/yashar-mirzaei-315135278)
+![screenshot-1](Description/screenshot-1.jpg)
+![screenshot-2](Description/screenshot-2.jpg)
+![screenshot-3](Description/screenshot-3.jpg)
+![screenshot-4](Description/screenshot-4.jpg)
 
 ## Developed by YasharTheGameDev
+### Contact
+[LinkTree](https://linktr.ee/YasharTheGameDev)
+[Linkdin](https://www.linkedin.com/in/yashar-mirzaei-315135278)
