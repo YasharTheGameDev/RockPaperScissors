@@ -30,4 +30,4 @@ Feel free to check out the code on GitHub or play the game on Itch.io!
 [LinkTree](https://linktr.ee/YasharTheGameDev)
 [Linkdin](https://www.linkedin.com/in/yashar-mirzaei-315135278)
 
-# H1 Developed by YasharTheGameDev
+## Developed by YasharTheGameDev
